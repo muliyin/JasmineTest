@@ -25,12 +25,17 @@ $(function () {
 		 */
 		it('should has real url', function () {
 			let checkUrl = true;
+			const regularExpressionUrl = /^((ht|f)tps?):\/\/([\w\-]+(\.[\w\-]+)*\/)*[\w\-]+(\.[\w\-]+)*\/?(\?([\w\-\.,@?^=%&:\/~\+#]*)+)?/; // 检查 URL 格式是否正确的正规表达式
+
 			for (let item of allFeeds) {
 				/*如果url未定义或为空*/
 				if (item.url === undefined || item.url == false) {
 					checkUrl = false;
 				}
+
+				expect(item.url).toMatch(regularExpressionUrl); // 检查格式
 			}
+
 			expect(checkUrl).toBe(true);
 		});
 
@@ -116,16 +121,32 @@ $(function () {
 
 		beforeEach((done) => {
 			/*加载第一个菜单项*/
-			loadFeed(0, () => {
-				beforeData = document.querySelector('.feed').textContent.replace(/\s*/g,'').toString();
-			});
+			const loadFirst = async function () {
+				return new Promise(((resolve) => {
+					loadFeed(0, () => {
+						beforeData = document.querySelector('.feed').textContent.replace(/\s*/g, '').toString();
+						resolve(1)
+					});
+				}))
+			};
 
 			/*加载第三个菜单项*/
-			loadFeed(2, () => {
-				afterData = document.querySelector('.feed').textContent.replace(/\s*/g,'').toString();
-				done();
-			});
+			const loadSecond = async function () {
+				return new Promise(((resolve) => {
+					loadFeed(2, () => {
+						afterData = document.querySelector('.feed').textContent.replace(/\s*/g, '').toString();
+						resolve(2);
+					});
+				}))
+			};
 
+			async function testLoad(cb) {
+				await loadFirst().then((result) => console.log(result));
+				await loadSecond().then((result) => console.log(result));
+				cb();
+			}
+
+			testLoad(done);
 		});
 
 		it('menu should change', function (done) {
