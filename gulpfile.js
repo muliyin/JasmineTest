@@ -4,7 +4,7 @@ const watch = require('gulp-watch')
 const browserSync = require('browser-sync').create();
 
 gulp.task('watch', async function () {
-	watch(['js/*.js','jasmine/**/*.js'],'change',browserSync.reload);
+	watch(['js/*.js','jasmine/**/*.js','index.html'],'change',browserSync.reload);
 });
 
 gulp.task('server', async function () {
